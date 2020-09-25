@@ -4,36 +4,35 @@ from gpiozero import Button
 from time import sleep
 import math
 
-GPIO.setmode(GPIO.BCM)
+GPIO.setmode(GPIO.BOARD)
 
 # GPIO pin names
-UI_Water = 12
-UI_Plant = 16
-X_Axis_Dir = 18
-Y_Axis_Dir = 23
-Z_Axis_Dir = 8
-Planter_Dir = 10
+UI_Plant = 12
+X_Axis_Dir = 8
+Y_Axis_Dir = 19
+Z_Axis_Dir = 24
+Planter_Dir = 31
 Water_Solenoid = 4
-SDA = 2
-SCL = 3
-X_Stop_Low = 5
-X_Stop_High = 6
-Y_Stop_Low = 13
-Y_Stop_High = 19
-Z_Stop_Low = 20
-Z_Stop_High = 21
+SDA = 3
+SCL = 5
+X_Stop_Low = 12
+X_Stop_High = 15
+Y_Stop_Low = 35
+Y_Stop_High = 37
+Z_Stop_Low = 38
+Z_Stop_High = 40
 
 # GPIO pin definitions
 button_water = Button(UI_Water)
 button_plant = Button(UI_Plant)
-GPIO.setup(17, GPIO.OUT)
-X_Axis_PWM = GPIO.PWM(17, 1000)
-GPIO.setup(22, GPIO.OUT)
-Y_Axis_PWM = GPIO.PWM(22, 1000)
-GPIO.setup(7, GPIO.OUT)
-Z_Axis_PWM = GPIO.PWM(7, 1000)
-GPIO.setup(9, GPIO.OUT)
-Planter_PWM = GPIO.PWM(9, 1000)
+GPIO.setup(10, GPIO.OUT)
+X_Axis_PWM = GPIO.PWM(10, 1000)
+GPIO.setup(21, GPIO.OUT)
+Y_Axis_PWM = GPIO.PWM(21, 1000)
+GPIO.setup(25, GPIO.OUT)
+Z_Axis_PWM = GPIO.PWM(25, 1000)
+GPIO.setup(33, GPIO.OUT)
+Planter_PWM = GPIO.PWM(33, 1000)
 GPIO.setup((X_Axis_Dir, Y_Axis_Dir, Z_Axis_Dir,
             Planter_Dir, Water_Solenoid), GPIO.OUT)
 GPIO.setup((X_Stop_Low, X_Stop_High, Y_Stop_Low,
