@@ -11,6 +11,7 @@ y_start = 0
 z_start = 0
 d_rows = 3  # the distance between rows required for plants to grow properly
 d_plants = 3  # distance between plants in row for them to grow properly
+water_delay = 1 # time to wait before watering plants again
 
 # Initialize the location list
 for j in range(0, num_rows):
@@ -34,15 +35,19 @@ def plant_main():
             CNCS.move(location, plant_loc[i])
             # plant a plant
             plant_loc[i].p = 1
+            CNCS.move(location, HOME)
             break
         if i == len(plant_loc) - 1:
             CNCS.move(location, HOME)
 
 
+timer = time()
 loop = 1
 while loop:
     # two buttons, one to water and one to plant new plants
-    CNCS.button_water.when_pressed = water_main
+    if (time() > timer + water_delay):
+        water_main()
+        timer = time()
     CNCS.button_plant.when_pressed = plant_main
 
 CNCS.GPIO.cleanup()
