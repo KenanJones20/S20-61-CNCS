@@ -43,9 +43,15 @@ Planter_PWM.start(50)
 sleep(2)
 Planter_PWM.stop()
 
+Sleep(1)
+
 #move all the motors backward
 GPIO.output((X_Axis_Dir,Y_Axis_Dir,Z_Axis_Dir,
              Planter_Dir), GPIO.HIGH)
+X_Axis_PWM.ChangeFrequency(FREQ)
+Y_Axis_PWM.ChangeFrequency(FREQ)
+Z_Axis_PWM.ChangeFrequency(FREQ)
+Planter_PWM.ChangeFrequency(FREQ)
 X_Axis_PWM.start(50)
 Y_Axis_PWM.start(50)
 Z_Axis_PWM.start(50)
