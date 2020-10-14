@@ -1,43 +1,46 @@
-
 import RPi.GPIO as GPIO
 from time import sleep
 
 GPIO.setmode(GPIO.BCM)
 
+FREQ = 500 #pwm frequency
+WATER_FREQ = 5 #time to wait before watering in seconds.
+Water_NEXT = 0 #next time to water the plants
+#constants that control how far each axis moves
+X_Constant = 17
+Y_Constant = 17
+Z_Constant = 17
+
 #GPIO pin names
+X_Axis_Dir = 10
+Y_Axis_Dir = 9
+Z_Axis_Dir = 11
+Planter_Dir = 15
 UI_Enable = 12
-X_Axis_Dir = 18
-Y_Axis_Dir = 23
-Z_Axis_Dir = 8
-Planter_Dir = 10
 Water_Solenoid = 4
 SDA = 2
 SCL = 3
-X_Stop_Low = 5
-X_Stop_High = 6
-Y_Stop_Low = 13
-Y_Stop_High = 19
-Z_Stop_Low = 20
-Z_Stop_High = 21
+X_Stop_Low = 6
+X_Stop_High = 13
+Y_Stop_Low = 19
+Y_Stop_High = 26
+Z_Stop_Low = 216
+Z_Stop_High = 20
 
 #GPIO pin definitions
 GPIO.setup(UI_Enable, GPIO.IN)
-GPIO.setup(17, GPIO.OUT)
-X_Axis_PWM = GPIO.PWM(17,1000)
-GPIO.setup(22, GPIO.OUT)
-Y_Axis_PWM = GPIO.PWM(22,1000)
+GPIO.setup(25, GPIO.OUT)
+X_Axis_PWM = GPIO.PWM(25,FREQ)
+GPIO.setup(8, GPIO.OUT)
+Y_Axis_PWM = GPIO.PWM(8,FREQ)
 GPIO.setup(7, GPIO.OUT)
-Z_Axis_PWM = GPIO.PWM(7,1000)
-GPIO.setup(9, GPIO.OUT)
-Planter_PWM = GPIO.PWM(9,1000)
+Z_Axis_PWM = GPIO.PWM(7,FREQ)
+GPIO.setup(18, GPIO.OUT)
+Planter_PWM = GPIO.PWM(18,FREQ)
 GPIO.setup((X_Axis_Dir,Y_Axis_Dir,Z_Axis_Dir,
             Planter_Dir,Water_Solenoid), GPIO.OUT)
 GPIO.setup((X_Stop_Low,X_Stop_High,Y_Stop_Low,
             Y_Stop_High,Z_Stop_Low,Z_Stop_High),GPIO.IN)
-
-X_Constant = 17
-Y_Constant = 17
-Z_Constant = 17
 
 def check_if_dry():
     #use I2C to get water sensor value
@@ -45,23 +48,17 @@ def check_if_dry():
     return 1
 
 def water():
-    #gpio.write(1,Water_Solenoid)
+    GPIO.write(1,Water_Solenoid)
     print("watering plant")
-    sleep(1)
-    #gpio.write(0,Water_Solenoid)
+    sleep(0.5)
+    GPIO.write(0,Water_Solenoid)
 
 def Move(from_loc, to_loc):
-    #the distance in inches
-    Delta_x = to_loc.x-from_loc.x
-    Delta_y = to_loc.y-from_loc.y
-    Delta_z = to_loc.z-from_loc.z
     #the number of steps needed to travel that far
-    X_Steps = Delta_x*X_Constant
-    Y_Steps = Delta_y*Y_Constant
-    Z_Steps = Delta_z*Z_Constant
+    X_Steps = (to_loc.x-from_loc.x)*X_Constant
+    Y_Steps = (to_loc.y-from_loc.y)*Y_Constant
+    Z_Steps = (to_loc.z-from_loc.z)*Z_Constant
     print("(X steps, Y steps) = (",str(X_Steps),str(Y_Steps),")")
-    #global location
-    #location = to_loc
     return to_loc
 
 class Location:
