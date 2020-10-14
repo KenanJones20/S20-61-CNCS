@@ -4,12 +4,10 @@ from time import sleep
 GPIO.setmode(GPIO.BCM)
 
 FREQ = 500 #pwm frequency
-WATER_FREQ = 5 #time to wait before watering in seconds.
-Water_NEXT = 0 #next time to water the plants
 #constants that control how far each axis moves
-X_Constant = 17
-Y_Constant = 17
-Z_Constant = 17
+X_Constant = 200
+Y_Constant = 200
+Z_Constant = 200
 
 #GPIO pin names
 X_Axis_Dir = 10
@@ -24,7 +22,7 @@ X_Stop_Low = 6
 X_Stop_High = 13
 Y_Stop_Low = 19
 Y_Stop_High = 26
-Z_Stop_Low = 216
+Z_Stop_Low = 16
 Z_Stop_High = 20
 
 #GPIO pin definitions
@@ -48,17 +46,33 @@ def check_if_dry():
     return 1
 
 def water():
-    GPIO.write(1,Water_Solenoid)
+    GPIO.output(Water_Solenoid, GPIO.HIGH)
     print("watering plant")
     sleep(0.5)
-    GPIO.write(0,Water_Solenoid)
+    GPIO.output(Water_Solenoid GPIO.LOW)
 
 def Move(from_loc, to_loc):
-    #the number of steps needed to travel that far
+    #the number of steps needed to spin each axis
     X_Steps = (to_loc.x-from_loc.x)*X_Constant
     Y_Steps = (to_loc.y-from_loc.y)*Y_Constant
     Z_Steps = (to_loc.z-from_loc.z)*Z_Constant
     print("(X steps, Y steps) = (",str(X_Steps),str(Y_Steps),")")
+    
+    GPIO.output(X_Axis_Dir, GPIO.HIGH if (X_Steps>0) else GPIO.LOW)
+    X_Axis_PWM.start(50)
+    sleep(abs(X_Steps/FREQ))
+    X_Axis_PWM.stop()
+
+    GPIO.output(Y_Axis_Dir, GPIO.HIGH if (Y_Steps>0) else GPIO.LOW)
+    Y_Axis_PWM.start(50)
+    sleep(abs(Y_Steps/FREQ))
+    Y_Axis_PWM.stop()
+
+    GPIO.output(Z_Axis_Dir, GPIO.HIGH if (Z_Steps>0) else GPIO.LOW)
+    Z_Axis_PWM.start(50)
+    sleep(abs(Z_Steps/FREQ))
+    Z_Axis_PWM.stop()
+
     return to_loc
 
 class Location:
