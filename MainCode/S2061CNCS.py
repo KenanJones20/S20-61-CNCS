@@ -2,6 +2,7 @@ from time import time
 
 import CNCS_Support as CNCS
 
+
 #This is the location to return to when not operating.
 HOME = CNCS.Location(0,0,20)
 #Stores the current location of the planter head in inches.
@@ -10,6 +11,7 @@ plants = []
 #The program waits this many seconds between watering the plants.
 WATER_DELAY = 5
 WATER_NEXT = time() + WATER_FREQ
+
 
 #Visit each plant and check to see if it needs to be watered.
 def Water_Main():
@@ -21,6 +23,7 @@ def Water_Main():
         CNCS.Move(HOME)
     else: print("There are currently no plants to water.")
 
+
 def main():
     #if gpio.read(UI_enable): UI_Main_Loop()
     
@@ -30,6 +33,7 @@ def main():
         Water_Main()
         WATER_NEXT = time() + WATER_DELAY
     else: print("No need to water right now.")
+
 
 #This loop is a simple text-based UI for testing purposes only.
 loop = 1
@@ -42,4 +46,3 @@ while loop:
     plants.sort(key=CNCS.Plant.getx)
     if input("enter X to exit main loop ") == "X": loop = 0
     main()
-CNCS.GPIO.cleanup()
