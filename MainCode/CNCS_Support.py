@@ -4,15 +4,15 @@ from time import sleep
 GPIO.setmode(GPIO.BCM)
 
 FREQ = 500 #pwm frequency
-#constants that control how far each axis moves
+#The number of steps each stepper motor axis moves per inch
 X_Constant = 200
 Y_Constant = 200
 Z_Constant = 200
 
 #GPIO pin names
-X_Axis_Dir = 10
-Y_Axis_Dir = 9
-Z_Axis_Dir = 11
+X_Dir = 10
+Y_Dir = 9
+Z_Dir = 11
 Planter_Dir = 15
 UI_Enable = 12
 Water_Solenoid = 4
@@ -35,40 +35,40 @@ GPIO.setup(7, GPIO.OUT)
 Z_Axis_PWM = GPIO.PWM(7,FREQ)
 GPIO.setup(18, GPIO.OUT)
 Planter_PWM = GPIO.PWM(18,FREQ)
-GPIO.setup((X_Axis_Dir,Y_Axis_Dir,Z_Axis_Dir,
+GPIO.setup((X_Dir,Y_Dir,Z_Dir,
             Planter_Dir,Water_Solenoid), GPIO.OUT)
 GPIO.setup((X_Stop_Low,X_Stop_High,Y_Stop_Low,
             Y_Stop_High,Z_Stop_Low,Z_Stop_High),GPIO.IN)
 
 def check_if_dry():
-    #use I2C to get water sensor value
-    #return value < Water_Constant
+    #Use I2C to get water sensor value.
+    #Return value < Water_Constant.
     return 1
 
 def water():
     GPIO.output(Water_Solenoid, GPIO.HIGH)
     print("watering plant")
     sleep(0.5)
-    GPIO.output(Water_Solenoid GPIO.LOW)
+    GPIO.output(Water_Solenoid, GPIO.LOW)
 
 def Move(from_loc, to_loc):
-    #the number of steps needed to spin each axis
+    #Find the number of steps to move each axis.
     X_Steps = (to_loc.x-from_loc.x)*X_Constant
     Y_Steps = (to_loc.y-from_loc.y)*Y_Constant
     Z_Steps = (to_loc.z-from_loc.z)*Z_Constant
     print("(X steps, Y steps) = (",str(X_Steps),str(Y_Steps),")")
     
-    GPIO.output(X_Axis_Dir, GPIO.HIGH if (X_Steps>0) else GPIO.LOW)
+    GPIO.output(X_Dir, GPIO.HIGH if (X_Steps>0) else GPIO.LOW)
     X_Axis_PWM.start(50)
     sleep(abs(X_Steps/FREQ))
     X_Axis_PWM.stop()
 
-    GPIO.output(Y_Axis_Dir, GPIO.HIGH if (Y_Steps>0) else GPIO.LOW)
+    GPIO.output(Y_Dir, GPIO.HIGH if (Y_Steps>0) else GPIO.LOW)
     Y_Axis_PWM.start(50)
     sleep(abs(Y_Steps/FREQ))
     Y_Axis_PWM.stop()
 
-    GPIO.output(Z_Axis_Dir, GPIO.HIGH if (Z_Steps>0) else GPIO.LOW)
+    GPIO.output(Z_Dir, GPIO.HIGH if (Z_Steps>0) else GPIO.LOW)
     Z_Axis_PWM.start(50)
     sleep(abs(Z_Steps/FREQ))
     Z_Axis_PWM.stop()
@@ -80,17 +80,17 @@ class Location:
         self.x = x
         self.y = y
         self.z = z
+
     def update(self, loc):
         self.x = loc.x
         self.y = loc.y
         self.z = loc.z
         return self
-    def distance(self, loc):
-        return math.sqrt(pow(loc.x-self.x,2)+pow(loc.y-self.y,2))
 
 class Plant:
     def __init__(self, x_loc, y_loc, size):
         self.location = Location(x_loc,y_loc)
         self.size = size
+
     def getx(self):
         return self.location.x
