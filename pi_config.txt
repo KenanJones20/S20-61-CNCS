@@ -1,0 +1,86 @@
+This is condensed version of how to get a private local access point working on Raspberry Pi.
+The whole guide can be found at:
+https://github.com/SurferTim/documentation/blob/
+	6bc583965254fa292a470990c40b145f553f6b34/configuration/wireless/access-point.md
+
+Make sure installation is up to date.
+
+	$ sudo apt-get update
+	$ sudo apt-get upgrade
+
+Install required software.
+
+	$ sudo apt-get install dnsmasq hostapd
+
+Disable while configuring.
+
+	$ sudo systemctl stop dnsmasq
+	$ sudo systemctl stop hostapd
+
+Assign static IP using 192.168.x.x standard. This server will be 192.168.0.1.
+
+	$ sudo nano /etc/dhcpcd.conf
+
+	At end of file edit so it looks like the following:
+
+		interface wlan0
+    			static ip_address=192.168.4.1/24
+	Restart.
+
+		$ sudo service dhcpcd restart
+
+Configure DHCP server (dnsmasq). Rename the original .conf file and edit a new one. The following information
+goes in the new .conf file.
+
+	interface=wlan0      # Use the require wireless interface - usually wlan0
+  		dhcp-range=192.168.4.2,192.168.4.20,255.255.255.0,24h
+
+See dnsmasq documentation for details. http://www.thekelleys.org.uk/dnsmasq/doc.html
+
+Configure /etc/hostapd/hostapd.conf, will initially be empty.
+
+	interface=wlan0
+	driver=nl80211
+	ssid=S2061
+	hw_mode=g
+	channel=7
+	wmm_enabled=0
+	macaddr_acl=0
+	auth_algs=1
+	ignore_broadcast_ssid=0
+	wpa=2
+	wpa_passphrase=CnCS-61!
+	wpa_key_mgmt=WPA-PSK
+	wpa_pairwise=TKIP
+	rsn_pairwise=CCMP
+
+Tell system where to find new .conf file.
+
+	$ sudo nano /etc/default/hostapd
+
+	Find line with #DAEMON_CONF, edit to:
+
+		DAEMON_CONF = "/etc/hostapd/hostapd.conf"
+
+Start the service
+
+	$ sudo service hostapd start  
+	$ sudo service dnsmasq start 
+
+Add routing and masquerade. edit /etc/sysctl.conf and uncomment:
+
+	net.ipv4.ip_forward=1
+
+Add a masquerade for outbound traffic on eth0:
+	
+	$ sudo iptables -t nat -A  POSTROUTING -o eth0 -j MASQUERADE
+
+Save the iptables rule:
+
+	$ sudo sh -c "iptables-save > /etc/iptables.ipv4.nat"
+
+Edit /etc/rc.local and add this above "exit 0":
+
+	iptables-restore < /etc/iptables.ipv4.nat
+
+Reboot and you should be able to find the spcified SSID and connect using the WPA2 passphrase.
