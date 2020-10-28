@@ -55,6 +55,7 @@ def __move__(pulse_channel, direc_channel, end_stop, value, steps):
         else: break
     return None
 
+#   Moves up if needed, then across X and Y, then down if needed.
 def Move(from_loc, to_loc):
     #Find the number of steps to move each axis.
     X_Steps = (to_loc.x-from_loc.x)*X_Constant
@@ -62,6 +63,8 @@ def Move(from_loc, to_loc):
     Z_Steps = (to_loc.z-from_loc.z)*Z_Constant
     print("(X steps, Y steps) = (",str(X_Steps),str(Y_Steps),")")
 
+    if Z_Steps > 0:
+        __move__(Z_Pulse, Z_Dir, Z_Stop_High, 1, Z_Steps)
     if X_Steps > 0:
         __move__(X_Pulse, X_Dir, X_Stop_High, 1, X_Steps)
     else:
@@ -70,11 +73,22 @@ def Move(from_loc, to_loc):
         __move__(Y_Pulse, Y_Dir, Y_Stop_High, 1, Y_Steps)
     else:
         __move__(Y_Pulse, Y_Dir, Y_Stop_Low, 0, abs(Y_Steps))
-    if Z_Steps > 0:
-        __move__(Z_Pulse, Z_Dir, Z_Stop_High, 1, Z_Steps)
-    else:
+    if Z_Steps < 0:
         __move__(Z_Pulse, Z_Dir, Z_Stop_Low, 0, abs(Z_Steps))
     return to_loc
+
+# Moves the planter head up, then across and down to plant the seed.
+def Plant_Seed(current_loc, destination):
+    loc = Location(0,0,0).update(current_loc)
+    Move(current_loc, loc.update(loc.x, loc.y, 20))
+    Move(loc, destination)
+    #plant the seed
+    for x in range(0,20):
+        Planter_Pulse.on()
+        sleep(DELAY)
+        Planter_Pulse.off()
+        sleep(DELAY)
+    return destination
 
 #May need to add "from signal import pause" and then "pause()" here.
 
