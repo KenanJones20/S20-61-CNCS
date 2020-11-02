@@ -9,8 +9,8 @@ HOME = CNCS.Location(0,0,20)
 Location = CNCS.Location().update(HOME)
 plants = []
 #The program waits this many seconds between watering the plants.
-WATER_DELAY = 5
-WATER_NEXT = time() + WATER_FREQ
+WATER_DELAY = 20
+WATER_NEXT = time() + WATER_DELAY
 
 
 #Visit each plant and check to see if it needs to be watered.
@@ -20,7 +20,7 @@ def Water_Main():
             global Location
             Location = CNCS.Move(Location, plant.location)
             if CNCS.check_if_dry(): CNCS.water()
-        CNCS.Move(HOME)
+        Location = CNCS.Move(HOME)
     else: print("There are currently no plants to water.")
 
 
@@ -41,6 +41,7 @@ while loop:
     plants.append(CNCS.Plant(
         int(input("Enter plant x location: ")),
         int(input("Enter plant y location: ")),1))
+    CNCS.Plant_Seed(Location, plants[-1].location)
     print("Plant added at ({0}, {1}).".format(
         plants[-1].location.x, plants[-1].location.y))
     plants.sort(key=CNCS.Plant.getx)
