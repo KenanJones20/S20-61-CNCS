@@ -3,9 +3,9 @@ from time import sleep
 
 DELAY = 0.001  #Pulse duration in seconds.
 #The number of steps each stepper motor axis moves per inch
-X_Constant = 200
-Y_Constant = 200
-Z_Constant = 200
+X_Constant = 100
+Y_Constant = 100
+Z_Constant = 100
 
 X_Dir = zero.LED(10)
 X_Pulse = zero.LED(25)
@@ -38,14 +38,15 @@ def water():
     Water_Solenoid.off()
     return None
 
-#Sets direc_channel to value and pulses pulse_channel steps times unless end_stop is pressed.
+#Sets direc_channel to value and pulses pulse_channel
+#steps times unless end_stop is pressed.
 def __move__(pulse_channel, direc_channel, end_stop, value, steps):
     if value:
         direc_channel.on()
     else:
         direc_channel.off()
     step = 0
-    while end_stop.is_pressed():
+    while not(end_stop.is_pressed):
         if step < steps:
             pulse_channel.on()
             step = step + 1
@@ -61,7 +62,8 @@ def Move(from_loc, to_loc):
     X_Steps = (to_loc.x-from_loc.x)*X_Constant
     Y_Steps = (to_loc.y-from_loc.y)*Y_Constant
     Z_Steps = (to_loc.z-from_loc.z)*Z_Constant
-    print("(X steps, Y steps) = (",str(X_Steps),str(Y_Steps),")")
+    print("(X steps, Y steps) = ({1}, {1})".format(
+        str(X_Steps),str(Y_Steps)))
 
     if Z_Steps > 0:
         __move__(Z_Pulse, Z_Dir, Z_Stop_High, 1, Z_Steps)
@@ -89,8 +91,6 @@ def Plant_Seed(current_loc, destination):
         Planter_Pulse.off()
         sleep(DELAY)
     return destination
-
-#May need to add "from signal import pause" and then "pause()" here.
 
 class Location:
     def __init__(self, x=0, y=0, z=0):
