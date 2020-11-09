@@ -7,24 +7,24 @@ X_Constant = 100
 Y_Constant = 100
 Z_Constant = 100
 
-X_Dir = zero.LED(10)
-X_Pulse = zero.LED(25)
-Y_Dir = zero.LED(9)
-Y_Pulse = zero(8)
-Z_Dir = zero.LED(11)
-Z_Pulse = zero.LED(7)
-Planter_Dir = zero.LED(15)
-Planter_Pulse = zero.LED(18)
-UI_Enable = 12
-Water_Solenoid = zero.LED(4)
-SDA = 2
-SCL = 3
-X_Stop_Low = zero.Button(6)
-X_Stop_High = zero.Button(13)
-Y_Stop_Low = zero.Button(19)
-Y_Stop_High = zero.Button(26)
-Z_Stop_Low = zero.Button(16)
-Z_Stop_High = zero.Button(20)
+X_Dir = zero.LED(19)
+X_Pulse = zero.LED(22)
+Y_Dir = zero.LED(21)
+Y_Pulse = zero(24)
+Z_Dir = zero.LED(23)
+Z_Pulse = zero.LED(26)
+Planter_Dir = zero.LED(10)
+Planter_Pulse = zero.LED(12)
+Planter_Solenoid = zero.LED(16)
+Water_Solenoid = zero.LED(7)
+SDA = 3
+SCL = 5
+X_Stop_Low = zero.Button(31)
+X_Stop_High = zero.Button(33)
+Y_Stop_Low = zero.Button(35)
+Y_Stop_High = zero.Button(37)
+Z_Stop_Low = zero.Button(36)
+Z_Stop_High = zero.Button(38)
 
 def check_if_dry():
     #Use I2C to get water sensor value.
