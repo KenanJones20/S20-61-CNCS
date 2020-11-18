@@ -1,34 +1,32 @@
 import gpiozero as zero
 from time import sleep
 
-DELAY = 0.001  #Pulse duration in seconds.
-#The number of steps each stepper motor axis moves per inch
-X_Constant = 20
-Y_Constant = 20
-Z_Constant = 20
+DELAY = 0.001  #Pulse duration in seconds
+#The number of steps each stepper motor moves per inch
+X_Constant = 21
+Y_Constant = 500
+Z_Constant = 500
 
-X_Dir = zero.LED(19)
-X_Pulse = zero.LED(22)
-Y_Dir = zero.LED(21)
-Y_Pulse = zero(24)
-Z_Dir = zero.LED(23)
-Z_Pulse = zero.LED(26)
-Planter_Dir = zero.LED(10)
-Planter_Pulse = zero.LED(12)
-Planter_Solenoid = zero.LED(16)
-Water_Solenoid = zero.LED(7)
-SDA = 3
-SCL = 5
-X_Stop_Low = zero.Button(31)
-X_Stop_High = zero.Button(33)
-Y_Stop_Low = zero.Button(35)
-Y_Stop_High = zero.Button(37)
-Z_Stop_Low = zero.Button(36)
-Z_Stop_High = zero.Button(38)
+X_Dir = zero.LED(10)
+X_Pulse = zero.LED(25)
+Y_Dir = zero.LED(9)
+Y_Pulse = zero.LED(8)
+Z_Dir = zero.LED(11)
+Z_Pulse = zero.LED(7)
+Planter_Dir = zero.LED(15)
+Planter_Pulse = zero.LED(18)
+Planter_Solenoid = zero.LED(23)
+Water_Solenoid = zero.LED(4)
+SDA = 2
+SCL = 3
+X_Stop_Low = zero.Button(6)
+X_Stop_High = zero.Button(13)
+Y_Stop_Low = zero.Button(19)
+Y_Stop_High = zero.Button(26)
+Z_Stop_Low = zero.Button(16)
+Z_Stop_High = zero.Button(20)
 
 def check_if_dry():
-    #Use I2C to get water sensor value.
-    #Return value < Water_Constant.
     return 1
 
 def water():
@@ -38,8 +36,6 @@ def water():
     Water_Solenoid.off()
     return None
 
-#Sets direc_channel to value and pulses pulse_channel
-#steps times unless end_stop is pressed.
 def __move__(pulse_channel, direc_channel, end_stop, value, steps):
     if value:
         direc_channel.on()
@@ -56,14 +52,12 @@ def __move__(pulse_channel, direc_channel, end_stop, value, steps):
         else: break
     return None
 
-#   Moves up if needed, then across X and Y, then down if needed.
 def Move(from_loc, to_loc):
-    #Find the number of steps to move each axis.
     X_Steps = (to_loc.x-from_loc.x)*X_Constant
     Y_Steps = (to_loc.y-from_loc.y)*Y_Constant
     Z_Steps = (to_loc.z-from_loc.z)*Z_Constant
-    print("(X steps, Y steps) = ({1}, {1})".format(
-        str(X_Steps),str(Y_Steps)))
+    print("Moving")
+    #print("(X steps, Y steps) = ({0}, {1})".format(str(X_Steps),str(Y_Steps)))
 
     if Z_Steps > 0:
         __move__(Z_Pulse, Z_Dir, Z_Stop_High, 1, Z_Steps)
@@ -79,10 +73,9 @@ def Move(from_loc, to_loc):
         __move__(Z_Pulse, Z_Dir, Z_Stop_Low, 0, abs(Z_Steps))
     return to_loc
 
-# Moves the planter head up, then across and down to plant the seed.
 def Plant_Seed(current_loc, destination):
-    loc = Location(0,0,0).update(current_loc)
-    Move(current_loc, loc.update(loc.x, loc.y, 20))
+    loc = Location().update(current_loc.x, current_loc.y, 20)
+    Move(current_loc, loc)
     Move(loc, destination)
     #plant the seed
     for x in range(0,20):
@@ -94,43 +87,44 @@ def Plant_Seed(current_loc, destination):
 
 class Location:
     def __init__(self, x=0, y=0, z=0):
-        self.x = x
-        self.y = y
-        self.z = z
+       self.x = x
+       self.y = y
+       self.z = z
 
     def update(self, loc):
-        self.x = loc.x
-        self.y = loc.y
-        self.z = loc.z
-        return self
+       self.x = loc.x
+       self.y = loc.y
+       self.z = loc.z
+       return self
 
 class Plant:
     def __init__(self, x_loc, y_loc, size):
-        self.location = Location(x_loc,y_loc)
+        self.location = Location(x_loc, Y_loc)
         self.size = size
 
     def getx(self):
         return self.location.x
 
-# Implements command-line controls: up, down, left, right, forward, backward
 while 1:
-    str = input("enter direction: u, d, l, r, f, b and distance to move").partition(" ")
+    str = input("enter direction: u, d, l, r, f, b and distance to move: ").partition(" ")
     dir = str[0].lower()
     distance = int(str[2])
-    if dir is "u":
-        Move(Location(0,0,0), Location(0,0,distance))
-    elif dir is "d":
-        Move(Location(0,0,distance), Location(0,0,0))
-    elif dir is "l":
-        Move(Location(0,0,0), Location(0,direction,0))
-    elif dir is "r":
-        Move(Location(0,distance,0), Location(0,0,0))
-    elif dir is "f":
-        Move(Location(0,0,0), Location(direction,0,0))
-    elif dir is "b":
-        Move(Location(distance,0,0), Location(0,0,0))
-    elif dir is "w":
+    if dir == "u":
+        Move(Location(), Location(z=distance))
+    elif dir == "d":
+        Move(Location(z=distance), Location())
+    elif dir == "l":
+        Move(Location(), Location(y=distance))
+    elif dir == "r":
+        Move(Location(y=distance), Location())
+    elif dir == "f":
+        Move(Location(), Location(x=distance))
+    elif dir == "b":
+        Move(Location(x=distance), Location())
+    elif dir == "w":
         water()
-    elif dir is "p":
-        Plant_Seed(Location(0,0,0), Location(distance,0,0))
-    else: break
+    elif dir == "p":
+        Plant_Seed(Location(), Location(x=distance))
+    elif dir == "x":
+        break
+    else: print("invalid command")
