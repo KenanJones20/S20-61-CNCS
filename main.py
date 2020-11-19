@@ -1,8 +1,6 @@
 import socket
-import sys
 import selectors
 import traceback
-import time
 
 import mainlib
 
@@ -11,8 +9,6 @@ from kivy.lang import Builder
 from kivy.properties import StringProperty
 from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.screenmanager import Screen
-from kivy.uix.label import Label
-import re
 
 
 class MainWindow(Screen):
@@ -30,7 +26,7 @@ class MainWindow(Screen):
             encoding="utf-8",
             content=dict(action="water", value="need")
         )
-        self.out = "watering needed"
+        self.out = "Watering needed..."
 
     def water_all_request(self):
         self.request = dict(
@@ -38,7 +34,7 @@ class MainWindow(Screen):
             encoding="utf-8",
             content=dict(action="water", value="all")
         )
-        self.out = "watering all"
+        self.out = "Watering all..."
 
     def plant_request(self):
         self.request = dict(
@@ -46,7 +42,15 @@ class MainWindow(Screen):
             encoding="utf-8",
             content=dict(action="plant"),
         )
-        self.out = "planting"
+        self.out = "Planting..."
+
+    def exit_request(self):
+        self.request = dict(
+            type="text/json",
+            encoding="utf-8",
+            content=dict(action="exit"),
+        )
+        self.out = "Raspberry Pi shutting down..."
 
     def start_connection(self):
         addr = (self.host, self.port)
@@ -75,7 +79,6 @@ class MainWindow(Screen):
                     break
         except KeyboardInterrupt:
             print("caught keyboard interrupt, exiting")
-
     pass
 
 
