@@ -1,0 +1,32 @@
+<MainWindow>:
+    GridLayout:
+        cols: 1
+        rows: 2
+        size: root.width, root.height
+
+        Label:
+            id: label
+            text: root.out
+            
+        GridLayout:
+            cols: 3
+            rows: 1
+
+            Button:
+                id: water_all
+                text: "water all"
+                on_release:
+                    root.water_all_request()
+                    root.start_connection()
+            Button:
+                id: water_need
+                text: "water needed"
+                on_release:
+                    root.water_need_request()
+                    root.start_connection()
+            Button:
+                id: plant
+                text: "plant"
+                on_release:
+                    root.plant_request()
+                    root.start_connection()
