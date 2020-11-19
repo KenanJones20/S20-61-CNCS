@@ -1,12 +1,15 @@
 <MainWindow>:
     GridLayout:
         cols: 1
-        rows: 2
+        rows: 3
         size: root.width, root.height
 
-        Label:
-            id: label
-            text: root.out
+        Button:
+            id: exit
+            text: "Exit"
+            on_release:
+                root.exit_request()
+                root.start_connection()
             
         GridLayout:
             cols: 3
@@ -14,19 +17,23 @@
 
             Button:
                 id: water_all
-                text: "water all"
+                text: "Water All"
                 on_release:
                     root.water_all_request()
                     root.start_connection()
             Button:
                 id: water_need
-                text: "water needed"
+                text: "Water Needed"
                 on_release:
                     root.water_need_request()
                     root.start_connection()
             Button:
                 id: plant
-                text: "plant"
+                text: "Plant"
                 on_release:
                     root.plant_request()
                     root.start_connection()
+
+        Label:
+            id: label
+            text: root.out
