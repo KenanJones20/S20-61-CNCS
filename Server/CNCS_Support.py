@@ -23,14 +23,14 @@ class Plant:
     def getx(self):
         return self.location.x
 
-HOME = Location(0,0,20) #home location to return to when not operating
+HOME = Location(0,0,10) #home location to return to when not operating
 plants = [] #list of all the plants
 WATER_FREQ = 5 #number of seconds to wait before watering again
 DELAY = 0.001  #Pulse duration in seconds
 #The number of steps each stepper motor moves per inch
 X_Constant = 21
-Y_Constant = 100
-Z_Constant = 100
+Y_Constant = 250
+Z_Constant = 250
 
 X_Dir = zero.LED(10)
 X_Pulse = zero.LED(25)
@@ -53,12 +53,15 @@ i2c_bus = busio.I2C(SCL, SDA)
 ss = Seesaw(i2c_bus, addr=0x36)
 
 def check_if_dry():
-    return ss.moisture_read()>500 ? 0:1
+    if(ss.moisture_read()>500):
+        return 0
+    else:
+        return 1
 
 def water():
     Water_Solenoid.on()
     print("watering plant")
-    sleep(0.5)
+    sleep(1)
     Water_Solenoid.off()
     return None
 
@@ -82,7 +85,6 @@ def Move(from_loc, to_loc):
     X_Steps = (to_loc.x-from_loc.x)*X_Constant
     Y_Steps = (to_loc.y-from_loc.y)*Y_Constant
     Z_Steps = (to_loc.z-from_loc.z)*Z_Constant
-    #print("Moving")
     print("(X steps, Y steps) = (" + str(X_Steps)
                     +","+str(Y_Steps)+")")
 
@@ -109,7 +111,7 @@ def Water_Main(plants, loc, check):
     return HOME
 
 def Plant_Seed(current_loc, destination):
-    loc = Location(current_loc.x, current_loc.y, 20)
+    loc = Location(current_loc.x, current_loc.y, 10)
     Move(current_loc, loc)
     Move(loc, destination)
     #plant the seed
@@ -125,4 +127,5 @@ def Plant_Seed(current_loc, destination):
         sleep(DELAY)
         Planter_Pulse.off()
         sleep(DELAY)
-    return destination
+    Move(destination, HOME)
+    return HOME
